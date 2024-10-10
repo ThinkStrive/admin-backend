@@ -1,0 +1,31 @@
+Authentication : 
+
+1. Authentication : 
+     - Google Authentication
+     - Github Authentication
+     - forgot Auth
+     - reset pass
+
+2. Course Buy
+
+
+
+
+
+client ID : 1064363283367-m3er6kvums2tijes262h0i3ejd84cfm3.apps.googleusercontent.com
+
+client Secert - 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
+
+
+
+
+problem : 
+update user -> password, theme.
+
+
+
+
+
+changes :
+1. pathway to success,
+2. 10 = yeanrs, 100 + webianrs, 10k stud

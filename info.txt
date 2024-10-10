@@ -1,0 +1,3 @@
+name - GamingKarthik
+pass - hkL_k2tdKHjvBqM
+cluster - mongodb+srv://GamingKarthik:<db_password>@cluster0.5fc7k.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
