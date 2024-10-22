@@ -29,7 +29,7 @@ app.use(Express.json())
 
 // API Routes
 // Authentication
-app.use('/', "welcome")
+// app.use('/', "welcome")
 app.use('/authentication', authRoute)
 
 
