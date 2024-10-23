@@ -13,11 +13,12 @@ let db_Name = process.env.DB_NAME || ''
 let db_Cluster = process.env.DB_CLUSTER || ''
 
 const cloudURL = `mongodb+srv://${db_UserName}:${db_password}@${db_Cluster}/${db_Name}?retryWrites=true&w=majority`;
-const URI = 'mongodb+srv://yadav:yadav@cluster1.ymy0t.mongodb.net/Scratch-Learn?retryWrites=true&w=majority'
+// const URI = 'mongodb+srv://yadav:yadav@cluster1.ymy0t.mongodb.net/Scratch-Learn?retryWrites=true&w=majority'
+// "mongodb+srv://GamingKarthik:<db_password>@cluster0.5fc7k.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
 export const dbConnect = async () => {
     try {
-        const db = await mongoose.connect(local)
+        const db = await mongoose.connect(cloudURL)
         if (db) {
             // await webinarModel.updateMany(
             //     { count: { $exists: false } },
