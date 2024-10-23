@@ -39,4 +39,8 @@ app.use('/users', usersRoute)
 // Payment
 app.use('/payment', paymentRouter)
 
+app.get('/', (req, res) =>{
+    res.send('Welcome')
+})
+
 app.listen(port, () => console.log('server is running on', port))
