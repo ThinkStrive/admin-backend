@@ -14,14 +14,23 @@ export const userLogin = async (req, res) => {
         }
 
         let checkUserEmail = await DB.findOne({ userEmail: payload.userEmail })
+        // if (checkUserEmail) {
+        //     bcrypt.compare(payload.password, checkUserEmail.password, (err, result) => {
+        //         if (!result) {
+        //             res.status(401).send({ status: false, data: 'Invalid password' })
+        //         } else {
+        //             res.send({ status: true, data: checkUserEmail })
+        //         }
+        //     })
+        // } else {
+        //     res.status(409).send({ status: false, data: "You don't have an account yet." })
+        // }
         if (checkUserEmail) {
-            bcrypt.compare(payload.password, checkUserEmail.password, (err, result) => {
-                if (!result) {
+                if (checkUserEmail.password !== payload.password) {
                     res.status(401).send({ status: false, data: 'Invalid password' })
                 } else {
                     res.send({ status: true, data: checkUserEmail })
                 }
-            })
         } else {
             res.status(409).send({ status: false, data: "You don't have an account yet." })
         }
@@ -35,13 +44,13 @@ export const userLogin = async (req, res) => {
 
 
 export const userRegister = async (req, res) => {
-    const { userEmail, password, userName, mobile_number } = req.body;
+    const { userEmail, password, userName, mobileNumber } = req.body;
 
-    if (!userEmail || !password || !userName || !mobile_number) {
+    if (!userEmail || !password || !userName || !mobileNumber) {
         return res.status(402).send({ status: true, data: "please fill the details" });
     }
 
-    if(mobile_number.length < 10){
+    if(mobileNumber.length < 10){
         return res.send({status : false, data : 'Please enter valid mobile number'})
     }
 
@@ -51,18 +60,10 @@ export const userRegister = async (req, res) => {
             return res.status(402).send({ status: false, data: "Already you have an Account" });
         }
 
-        const salt = await bcrypt.genSalt(10);
-        const hash = await bcrypt.hash(password, salt);
-        if(userEmail === 'sieora.dev@gmail.com' && password === 'sieora.dev'){
-            const createUser = await DB.create({ ...req.body, password: hash, userId: v4(), role : 'admin' });
-            if(createUser){
-                return res.status(200).send({status : true, data : createUser})
-            }else{
-                return res.status(409).send({status : false, data : 'Problem with creating user'})
-            }
-        }
+        // const salt = await bcrypt.genSalt(10);
+        // const hash = await bcrypt.hash(password, salt);
         
-        const createUser = await DB.create({ ...req.body, password: hash, userId: v4(), role : 'user' });
+        const createUser = await DB.create({ ...req.body, userId: v4(), role : 'user' });
         if (createUser) {
             res.status(201).send({ status: true, data: createUser });
         } else {

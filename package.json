@@ -23,6 +23,7 @@
     "moment": "^2.30.1",
     "moment-timezone": "^0.5.45",
     "mongoose": "^8.4.0",
+    "paypal-rest-sdk": "^1.8.1",
     "uuid": "^10.0.0"
   },
   "devDependencies": {

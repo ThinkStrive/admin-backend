@@ -1,9 +1,15 @@
 import { v4 } from 'uuid'
 import { paymentModel } from '../DB/models/payment.js'
-
+import paypal from 'paypal-rest-sdk'
 
 let DB = paymentModel
 
+
+paypal.configure({
+    'mode': 'sandbox', // Use 'sandbox' for testing, 'live' for production
+    'client_id': 'Ae8c5W77ylvoWjcDjSadyr91jzuAGZ_6huhBvwlSvmjNEouUGnhmNJj90NhtM4BdbRiZM3ThApo9pIVH',
+    'client_secret': 'EJwFzCIX9RXxeuz7hKtj1pYMTmcADx7Om04BH8zKRKieb_aLPkGn9mQvrb1PZEaLdy063GAeAmn9ffKO'
+  });
 
 
 export const listAllPayments = async (req, res) => {
@@ -39,6 +45,76 @@ export const getSinglePayment = async (req, res) => {
     }
 };
 
+
+export const paymentRequest = async(req, res) => {
+    const { items } = req.body;
+
+    console.log('items', items)
+    
+    const create_payment_json = {
+      "intent": "sale",
+      "payer": {
+        "payment_method": "paypal"
+      },
+      "redirect_urls": {
+        "return_url": "https://app.rouletterise.com/project1/blackRed",
+        "cancel_url": "https://app.rouletterise.com/project1/blackRed"
+      },
+      "transactions": [{
+        "item_list": {
+          "items": items
+        },
+        "amount": {
+          "currency": "USD",
+          "total": items[0].price
+        },
+        "description": "Payment for items."
+      }]
+    };
+
+  
+    paypal.payment.create(create_payment_json, (error, payment) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Payment creation failed' });
+      } else {
+        let approvalUrl;
+        for (let i = 0; i < payment.links.length; i++) {
+          if (payment.links[i].rel === 'approval_url') {
+            approvalUrl = payment.links[i].href;
+            break;
+          }
+        }
+        res.status(200).json({ approvalUrl });
+      }
+    });
+}
+
+
+export const paymentCheckSuccess = async(req, res) => {
+    const payerId = req.query.PayerID;
+    const paymentId = req.query.paymentId;
+  
+    const execute_payment_json = {
+      "payer_id": payerId,
+      "transactions": [{
+        "amount": {
+          "currency": "USD",
+          "total": "25.00"
+        }
+      }]
+    };
+  
+    paypal.payment.execute(paymentId, execute_payment_json, (error, payment) => {
+      if (error) {
+        console.error(error.response);
+        res.send('Payment could not be completed');
+      } else {
+        res.send('Payment successful');
+      }
+    });
+}
+  
 
 
 
