@@ -29,6 +29,7 @@ app.use(Express.json())
 
 // API Routes
 // Authentication
+// app.use('/', "welcome")
 app.use('/authentication', authRoute)
 
 
@@ -37,5 +38,9 @@ app.use('/users', usersRoute)
 
 // Payment
 app.use('/payment', paymentRouter)
+
+app.get('/', (req, res) =>{
+    res.send('Welcome')
+})
 
 app.listen(port, () => console.log('server is running on', port))
