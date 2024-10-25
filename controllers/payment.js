@@ -6,7 +6,7 @@ let DB = paymentModel
 
 
 paypal.configure({
-    'mode': 'sandbox', // Use 'sandbox' for testing, 'live' for production
+    'mode': 'live', // Use 'sandbox' for testing, 'live' for production
     'client_id': 'Ae8c5W77ylvoWjcDjSadyr91jzuAGZ_6huhBvwlSvmjNEouUGnhmNJj90NhtM4BdbRiZM3ThApo9pIVH',
     'client_secret': 'EJwFzCIX9RXxeuz7hKtj1pYMTmcADx7Om04BH8zKRKieb_aLPkGn9mQvrb1PZEaLdy063GAeAmn9ffKO'
   });
