@@ -7,8 +7,8 @@ let DB = paymentModel
 
 paypal.configure({
     'mode': 'live', // Use 'sandbox' for testing, 'live' for production
-    'client_id': 'Ae8c5W77ylvoWjcDjSadyr91jzuAGZ_6huhBvwlSvmjNEouUGnhmNJj90NhtM4BdbRiZM3ThApo9pIVH',
-    'client_secret': 'EJwFzCIX9RXxeuz7hKtj1pYMTmcADx7Om04BH8zKRKieb_aLPkGn9mQvrb1PZEaLdy063GAeAmn9ffKO'
+    'client_id': 'AR0L1jVLP_gPz_AUeMxSsXitN3Ims-tSYIZMavltemy6HSsZB-juwGyXC7-TaVpYswIwZIsyFtCIEjvt',
+    'client_secret': 'EEIY4z-hhJbRRyP5XndSGVf8Xhu_r7gYTeM46TOSGN6NbQbXOIHPwZ36kjbtR7O3Ex-d78sqhpVXA9mg'
   });
 
 
