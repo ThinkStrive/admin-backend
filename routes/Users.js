@@ -1,5 +1,5 @@
 import Express from 'express';
-import { createNewUser, deleteSingleUser, getSingleUser, listAllUsers, updateSingleUser } from '../controllers/Users.js';
+import { createNewUser, deleteSingleUser, getSingleUser, listAllUsers, updateSingleUser} from '../controllers/Users.js';
 
 
 export const usersRoute = Express.Router()
@@ -14,6 +14,7 @@ usersRoute.post('/', createNewUser);
 usersRoute.put('/:id', updateSingleUser);
 
 usersRoute.delete('/:id', deleteSingleUser);
+
 
 
 

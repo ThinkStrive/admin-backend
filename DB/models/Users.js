@@ -20,7 +20,15 @@ const userSchema = new mongoose.Schema({
     subscription : [{
         subscription_id : { type : String }
     }],
-    subscriptionType : {type : String, default : 'none'},
+    subscriptionType: {
+        type: String,
+        enum: ['daily', 'weekly', 'monthly', 'none'],
+        default: 'none'
+    },
+    isPaid : {
+        paid : {type : Boolean, default : false},
+        paidType : {type : String, default : 'none'}
+    },
     subscriptionDate : {type : String, default : 'none'},
     subscriptionTime : {type : String, default : 'none'},
     projectsPlan : {

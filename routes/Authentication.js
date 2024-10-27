@@ -1,5 +1,5 @@
 import Express from 'express';
-import { userLogin, userLoginGoogle, userRegister } from '../controllers/Authentication.js';
+import { userForgotPassword, userLogin, userLoginGoogle, userRegister, userResetPassword } from '../controllers/Authentication.js';
 
 
 export const authRoute = Express.Router()
@@ -10,5 +10,6 @@ export const authRoute = Express.Router()
 authRoute.post('/login', userLogin);
 
 authRoute.post('/register', userRegister);
-
-authRoute.post('/google_login', userLoginGoogle)
+authRoute.post('/forgotPassword',userForgotPassword);
+authRoute.post('/resetPassword',userResetPassword)
+authRoute.post('/google_login', userLoginGoogle);

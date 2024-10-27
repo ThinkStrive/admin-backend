@@ -5,6 +5,7 @@ import { dbConnect } from './DB/connection/Connection.js';
 import { usersRoute } from './routes/Users.js';
 import { authRoute } from './routes/Authentication.js';
 import { paymentRouter } from './routes/payment.js';
+import { checkAndExpireSubscriptions } from './controllers/Schedule.js';
 
 
 // Config
@@ -38,6 +39,9 @@ app.use('/users', usersRoute)
 
 // Payment
 app.use('/payment', paymentRouter)
+
+
+checkAndExpireSubscriptions()
 
 app.get('/', (req, res) =>{
     res.send('Welcome')

@@ -3,7 +3,7 @@ import { userModel } from "../DB/models/Users.js"
 import jwt from "jsonwebtoken";
 import axios from 'axios';
 import { v4 } from 'uuid';
-
+import { transporter,mailOptions } from '../routes/mail.js';
 let DB = userModel
 
 export const userLogin = async (req, res) => {
@@ -40,6 +40,36 @@ export const userLogin = async (req, res) => {
     }
 }
 
+export const userRegisterVerifyEmail = async (req, res) => {
+    const { userEmail, password, userName, mobileNumber } = req.body;
+
+    if (!userEmail || !password || !userName || !mobileNumber) {
+        return res.status(402).send({ status: true, data: "please fill the details" });
+    }
+
+    if(mobileNumber.length < 10){
+        return res.send({status : false, data : 'Please enter valid mobile number'})
+    }
+    try {
+        const checkUserExists = await DB.findOne({ userEmail });
+        if(checkUserExists){
+            return res.status(402).send({ status: false, data: "Already you have an Account" });
+        }
+        const verifyToken = jwt.sign(
+            { userEmail, password, userName, mobileNumber },
+            process.env.JWT_SECRET,
+            { expiresIn: "1day" }
+        );
+        let verifyEmailLink = `${frontend_url}/auth/verifyEmail?verify=${verifyToken}`;
+        const mailResponse={...mailOptions,to:userEmail, text:`Hi, please verify your account ${verifyEmailLink}`}
+        await transporter.sendMail(mailResponse)
+        res.status(200).send({msg:'Please Verify Your Email', status : true, data : userEmail});
+
+    } catch (err) {
+        console.log(err);
+        return res.status(500).send({ msg: 'Internal Server Error', data: err });
+    }
+}
 
 
 
@@ -105,76 +135,81 @@ export const userLoginGoogle = async (req, res) => {
 
 
 
-// export const userForgotPassword = async (req, res) => {
-//     const { userEmail } = req.body;
-//     try {
-//         const validUser = await DB.findOne({ userEmail });
+export const userForgotPassword = async (req, res) => {
+    const { userEmail } = req.body;
+    try {
+        const validUser = await DB.findOne({ userEmail });
 
-//         if (!validUser) {
-//             return res.status(409).send({ status: false, data: 'Invalid user' })
-//         }
-//         const verifyToken = jwt.sign(
-//             { userEmail },
-//             process.env.JWT_SECRET,
-//             { expiresIn: "1day" }
-//         );
-//         const data = {
-//             name: validUser.userName,
-//             email: validUser.userEmail,
-//             number: validUser.mobile_number,
-//             reset_link: `${frontend_url}/auth/resetPassword?verify=${verifyToken}`
-//         };
-//         try {
-//             const mailResponse = await axios.post(SEND_MAIL_FOR_USER_FORGOT_PASSWORD, data);
-//             if (mailResponse.data.success) {
-//                 return res.status(201).send({ status: true });
-//             } else {
-//                 return res.status(403).send({ status: false, data: 'Failed to send mail' });
-//             }
-//         } catch (mailError) {
-//             console.log(mailError);
-//             return res.status(500).send({ status: false, data: 'Failed to send mail' });
-//         }
-//     } catch (err) {
-//         res.status(500).send(err);
-//     }
-// }
+        if (!validUser) {
+            return res.status(409).send({ status: false, data: 'Invalid user' })
+        }
+        const verifyToken = jwt.sign(
+            { userEmail },
+            process.env.JWT_SECRET,
+            { expiresIn: "1day" }
+        );
+        const data = {
+            name: validUser.userName,
+            email: validUser.userEmail,
+            // number: validUser.mobile_number,
+            reset_link: `${frontend_url}/auth/resetPassword?verify=${verifyToken}`
+        };
+        try {
+            // const mailResponse = await axios.post(SEND_MAIL_FOR_USER_FORGOT_PASSWORD, data);
+
+            const mailResponse={...mailOptions,to:userEmail, text:`Hi, please click the link below to confirm your account ${data.reset_link}`}
+            await transporter.sendMail(mailResponse)
+            res.status(200).send({msg:'your account has been verified'});
+
+            if (mailResponse.data.success) {
+                return res.status(201).send({ status: true });
+            } else {
+                return res.status(403).send({ status: false, data: 'Failed to send mail' });
+            }
+        } catch (mailError) {
+            console.log(mailError);
+            return res.status(500).send({ status: false, data: 'Failed to send mail' });
+        }
+    } catch (err) {
+        res.status(500).send(err);
+    }
+}
 
 
 
 
 
 
-// export const userResetPassword = async (req, res) => {
-//     const { verifyToken, password } = req.body;
+export const userResetPassword = async (req, res) => {
+    const { verifyToken, password } = req.body;
 
-//     try {
-//         // Verify the token
-//         const decoded = jwt.verify(verifyToken, process.env.JWT_SECRET);
-//         const userEmail = decoded.userEmail;
+    try {
+        // Verify the token
+        const decoded = jwt.verify(verifyToken, process.env.JWT_SECRET);
+        const userEmail = decoded.userEmail;
 
-//         const validUser = await DB.findOne({ userEmail });
+        const validUser = await DB.findOne({ userEmail });
 
-//         if (!validUser) {
-//             return res.status(409).send({ status: false, data: 'Invalid user' });
-//         }
+        if (!validUser) {
+            return res.status(409).send({ status: false, data: 'Invalid user' });
+        }
 
-//         // Hash the new password
-//         const salt = await bcrypt.genSalt(10);
-//         const hashedPassword = await bcrypt.hash(password, salt);
+        // Hash the new password
+        // const salt = await bcrypt.genSalt(10);
+        // const hashedPassword = await bcrypt.hash(password, salt);
 
-//         // Update the user's password
-//         validUser.password = hashedPassword;
-//         await validUser.save();
+        // Update the user's password
+        validUser.password = password;
+        await validUser.save();
 
-//         return res.status(200).send({ status: true, data: 'Password reset successful' });
-//     } catch (err) {
-//         console.log(err);
-//         if (err.name === 'TokenExpiredError') {
-//             return res.status(400).send({ status: false, data: 'Token expired' });
-//         }
-//         return res.status(500).send({ status: false, data: 'Internal Server Error' });
-//     }
-// };
+        return res.status(200).send({ status: true, data: 'Password reset successful' });
+    } catch (err) {
+        console.log(err);
+        if (err.name === 'TokenExpiredError') {
+            return res.status(400).send({ status: false, data: 'Token expired' });
+        }
+        return res.status(500).send({ status: false, data: 'Internal Server Error' });
+    }
+};
 
 
