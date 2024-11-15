@@ -261,7 +261,7 @@ export const userForgotPassword = async (req, res) => {
         const data = {
             name: validUser.userName,
             email: validUser.userEmail,
-            reset_link: `${process.env.LOCAL_FE_URL}/auth/resetPassword?verify=${verifyToken}`
+            reset_link: `${process.env.FE_URL || 'https://gamin01.netlify.app'}/auth/resetPassword?verify=${verifyToken}`
         };
 
         // console.log("data", data.reset_link);
