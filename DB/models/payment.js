@@ -36,7 +36,7 @@ const paymentSchema = mongoose.Schema({
         required : true
     },
     customer_details : {}
-})
+},{timestamps:true})
 
 
 export const paymentModel = mongoose.model('payments', paymentSchema)
