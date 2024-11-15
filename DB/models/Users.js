@@ -32,8 +32,8 @@ const userSchema = new mongoose.Schema({
     subscriptionDate : {type : String, default : 'none'},
     subscriptionTime : {type : String, default : 'none'},
     projectsPlan : {
-        project1 : { type : Boolean, default : true },
-        project2 : { type : Boolean, default : true },
+        project1 : { type : Boolean, default : false },
+        project2 : { type : Boolean, default : false },
         project4 : { type : Boolean, default : false },
     },
     isVerified:{
