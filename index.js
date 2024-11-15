@@ -4,7 +4,7 @@ import dotenv from 'dotenv'
 import cors from 'cors'
 import { dbConnect } from './DB/connection/Connection.js';
 import { usersRoute } from './routes/Users.js';
-// import { authRoute } from './routes/Authentication.js';
+import { authRoute } from './routes/Authentication.js';
 import { paymentRouter } from './routes/payment.js';
 import { checkAndExpireSubscriptions } from './controllers/Schedule.js';
 
@@ -57,7 +57,7 @@ app.use(cors());
 // API Routes
 // Authentication
 // app.use('/', "welcome")
-// app.use('/authentication', authRoute)
+app.use('/authentication', authRoute)
 
 
 // // Users
