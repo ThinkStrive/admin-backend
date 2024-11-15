@@ -3,10 +3,10 @@ import Express from 'express';
 import dotenv from 'dotenv'
 import cors from 'cors'
 import { dbConnect } from './DB/connection/Connection.js';
-import { usersRoute } from './routes/Users.js';
-import { authRoute } from './routes/Authentication.js';
-import { paymentRouter } from './routes/payment.js';
-import { checkAndExpireSubscriptions } from './controllers/Schedule.js';
+// import { usersRoute } from './routes/Users.js';
+// import { authRoute } from './routes/Authentication.js';
+// import { paymentRouter } from './routes/payment.js';
+// import { checkAndExpireSubscriptions } from './controllers/Schedule.js';
 
 
 // Config
@@ -57,17 +57,17 @@ app.use(cors());
 // API Routes
 // Authentication
 // app.use('/', "welcome")
-app.use('/authentication', authRoute)
+// app.use('/authentication', authRoute)
 
 
-// Users
-app.use('/users', usersRoute)
+// // Users
+// app.use('/users', usersRoute)
 
-// Payment
-app.use('/payment', paymentRouter)
+// // Payment
+// app.use('/payment', paymentRouter)
 
 
-checkAndExpireSubscriptions()
+// checkAndExpireSubscriptions()
 
 app.get('/', (req, res) => {
   res.send('Welcome')
