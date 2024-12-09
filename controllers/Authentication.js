@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import axios from 'axios';
 import { v4 } from 'uuid';
 import { transporter, mailOptions } from '../routes/mail.js';
-import { EMAIL_VERIFIED_WELCOME_TEMPLATE, PASSWORD_RESET_REQUEST_TEMPLATE, PASSWORD_RESET_SUCCESS_TEMPLATE, VERIFICATION_EMAIL_TEMPLATE } from '../routes/mailTemplate.js';
+import { EMAIL_VERIFIED_WELCOME_TEMPLATE, PASSWORD_RESET_REQUEST_TEMPLATE, PASSWORD_RESET_SUCCESS_TEMPLATE, VERIFICATION_EMAIL_TEMPLATE,PLAN_ACTIVATED_SUCCESS_TEMPLATE } from '../routes/mailTemplate.js'
 import dotenv from 'dotenv'
 import { generateEmailOTP } from '../utils/generateEmailOTP.js';
 let DB = userModel
@@ -393,3 +393,52 @@ export const userDelete = async (req, res) => {
         return res.status(500).send({ msg: 'Internal Server Error', data: err });
     }
 }
+
+
+
+
+
+
+export const sendPlanActivatedEmail = async ({
+    userEmail,
+    subscriptionType,
+    subscriptionDate,
+}) => {
+    try {
+        // Find user by email
+        const validUser = await DB.findOne({ userEmail });
+        if (!validUser) {
+            throw new Error('Invalid user');
+        }
+
+        const data = {
+            name: validUser.userName,
+            email: validUser.userEmail,
+            plan_name: subscriptionType,
+            activation_date: subscriptionDate,
+            // expiry_date: expiryDate,
+        };
+
+        // Prepare email options with dynamic template
+        const emailTemplate = PLAN_ACTIVATED_SUCCESS_TEMPLATE
+            .replace('[PLAN_NAME]', data.plan_name)
+
+            .replace('[NAME]',data.name);
+            // .replace('[ACTIVATION_DATE]', data.activation_date)
+            // .replace('[EXPIRY_DATE]', data.expiry_date);
+
+        const mailResponse = {
+            ...mailOptions,
+            to: userEmail,
+            subject: `Your ${subscriptionType} Plan is Activated Successfully`,
+            html: emailTemplate,
+        };
+
+        // Send email
+        await transporter.sendMail(mailResponse);
+        console.log('Plan activation email sent successfully.');
+    } catch (error) {
+        console.error('Error in sendPlanActivatedEmail:', error);
+        throw error; 
+    }
+};
