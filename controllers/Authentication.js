@@ -4,9 +4,9 @@ import jwt from "jsonwebtoken";
 import axios from 'axios';
 import { v4 } from 'uuid';
 import { transporter, mailOptions } from '../routes/mail.js';
-import { EMAIL_VERIFIED_WELCOME_TEMPLATE, PASSWORD_RESET_REQUEST_TEMPLATE, PASSWORD_RESET_SUCCESS_TEMPLATE, VERIFICATION_EMAIL_TEMPLATE,PLAN_ACTIVATED_SUCCESS_TEMPLATE } from '../routes/mailTemplate.js'
+import { EMAIL_VERIFIED_WELCOME_TEMPLATE, PASSWORD_RESET_REQUEST_TEMPLATE, PASSWORD_RESET_SUCCESS_TEMPLATE, VERIFICATION_EMAIL_TEMPLATE,PLAN_ACTIVATED_SUCCESS_TEMPLATE } from '../routes/mailTemplate.js';
 import dotenv from 'dotenv'
-import { generateEmailOTP } from '../utils/generateEmailOTP.js';
+import { generateEmailOTP } from '../utils/generateEmailOTP';
 let DB = userModel
 
 // Config
@@ -261,7 +261,7 @@ export const userForgotPassword = async (req, res) => {
         const data = {
             name: validUser.userName,
             email: validUser.userEmail,
-            reset_link: `${process.env.FE_URL || 'https://gamin01.netlify.app'}/auth/resetPassword?verify=${verifyToken}`
+            reset_link: `${process.env.LOCAL_FE_URL}/auth/resetPassword?verify=${verifyToken}`
         };
 
         // console.log("data", data.reset_link);
@@ -395,9 +395,7 @@ export const userDelete = async (req, res) => {
 }
 
 
-
-
-
+// plan activated successfully Mail 
 
 export const sendPlanActivatedEmail = async ({
     userEmail,
@@ -442,3 +440,4 @@ export const sendPlanActivatedEmail = async ({
         throw error; 
     }
 };
+

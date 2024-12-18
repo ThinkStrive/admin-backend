@@ -33,7 +33,8 @@ const userSchema = new mongoose.Schema({
     subscriptionTime : {type : String, default : 'none'},
     projectsPlan : {
         project1 : { type : Boolean, default : false },
-        project2 : { type : Boolean, default : false },
+        project2 : { type : Boolean, default : true },
+        project3 : { type : Boolean, default : false },
         project4 : { type : Boolean, default : false },
     },
     isVerified:{
@@ -43,5 +44,8 @@ const userSchema = new mongoose.Schema({
     verificationToken:String,
     verificationTokenExpiresAt:Date,
 },{timestamps:true});
+
+userSchema.index({userEmail:1});
+userSchema.index({mobileNumber:1});
 
 export const userModel = mongoose.model('users', userSchema);

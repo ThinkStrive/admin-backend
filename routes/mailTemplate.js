@@ -795,4 +795,41 @@ export const PASSWORD_RESET_SUCCESS_TEMPLATE = `
 
 `;
 
+export const ADMIN_MAIL_TEMPLATE = (subject,userName,dynamicBody)=>{
+  return `
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${subject}</title>
+</head>
+<body style="background-color: #f3f4f6; max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; color: #1f2937;">
+
+  <div style="background: linear-gradient(to right, #6b46c1, #4c51bf); border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); overflow: hidden;">
+    
+    <!-- Header Section -->
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.25rem;">
+      <img src="https://res.cloudinary.com/dmd5xjtit/image/upload/v1733136588/RouletteRise_Transperent_Logo_rhaaxk.png" alt="Logo" style="width: 80px; height: 80px;">
+      <h1 style="color: white; font-size: 1.25rem; font-weight: bold; margin-left: 1.25rem; flex-grow: 1; margin-left:65px">Greetings from RouletteRise</h1>
+    </div>
+
+    <!-- Content Body -->
+    <div style="background-color: white; padding: 1.5rem; border-radius: 0 0 0.5rem 0.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); position: relative;">
+      <p style="margin-bottom: 1rem;">Hello, ${userName}</p>
+      <p style="margin-bottom: 1rem;">${dynamicBody}</p> 
+
+      <p style="margin-bottom: 1rem;">Best regards,<br>
+        <span style="color: #6b46c1; font-weight: bold;">RouletteRise</span>
+      </p>
+
+      <!-- Watermark -->
+      <img src="https://res.cloudinary.com/dmd5xjtit/image/upload/v1733136588/RouletteRise_Transperent_Logo_rhaaxk.png" alt="Watermark" style="position: absolute; top: 20rem; right: 1.25rem; opacity: 0.1; width: 6rem; height: 6rem;">
+    </div>
+  </div>
+</body>
+</html>
+  `
+}
+
 

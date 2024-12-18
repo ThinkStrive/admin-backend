@@ -1,40 +1,32 @@
-
 import Express from 'express';
-import dotenv from 'dotenv'
-import cors from 'cors'
+import dotenv from 'dotenv';
+import cors from 'cors';
 import { dbConnect } from './DB/connection/Connection.js';
 import { usersRoute } from './routes/Users.js';
 import { authRoute } from './routes/Authentication.js';
 import { paymentRouter } from './routes/payment.js';
 import { checkAndExpireSubscriptions } from './controllers/Schedule.js';
-
+import { feedbackRoutes } from './routes/Feedback.js'; 
+import { historyRouter } from './routes/paidHistoryRoutes.js';
+import { AdminEmailRoute } from './routes/AdminEmail.js';
 
 // Config
-dotenv.config()
-let db = await dbConnect()
+dotenv.config();
+const db = await dbConnect();
 console.log(db);
 
-
-const app = Express()
-
-
+const app = Express();
 
 // PORT
-const port = process.env.PORT ||''
+const port = process.env.PORT || 7050;
 
-
-// Default Middleware
-app.use(cors())
-app.use(Express.json())
-
+// CORS Configuration
 const allowedOrigins = [
   'https://game01-seven.vercel.app',
-  "https://gaming01.vercel.app",
+  'https://gaming01.vercel.app',
   'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:5000',
-  'https://gamin01.netlify.app',
-  'https://admin-gaming.netlify.app'
   // Add more domains as needed
 ];
 
@@ -43,34 +35,35 @@ const corsOptions = {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.error(`CORS error: Origin ${origin} not allowed`);
       callback(new Error('Not allowed by CORS'));
     }
   },
-  methods: 'GET,POST,PUT,DELETE', // Allowed methods
-  allowedHeaders: 'Content-Type,Authorization', // Headers you want to allow
-  credentials: true, // Enable if you need cookies/auth headers
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
 };
 
-app.use(cors());
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Handle preflight requests
 
+// Middleware
+app.use(Express.json());
 
 // API Routes
-// Authentication
-// app.use('/', "welcome")
-app.use('/authentication', authRoute)
+app.use('/authentication', authRoute);
+app.use('/users', usersRoute);
+app.use('/payment', paymentRouter);
+app.use('/feedback', feedbackRoutes);
+app.use('/paid-history' , historyRouter);
+app.use('/email',AdminEmailRoute);
 
 
-// // Users
-app.use('/users', usersRoute)
+// Schedule Expiry Check
+checkAndExpireSubscriptions();
 
-// // Payment
-app.use('/payment', paymentRouter)
+// Default Route
 
 
-checkAndExpireSubscriptions()
-
-app.get('/', (req, res) => {
-  res.send('Welcome')
-})
-
-app.listen(port, () => console.log('server is running on', port))
+// Start Server
+app.listen(port, () => console.log(`Server is running on port ${port}`));

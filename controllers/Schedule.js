@@ -1,6 +1,7 @@
 import cron from 'node-cron';
 import moment from 'moment-timezone';
 import { userModel } from '../DB/models/Users.js';
+import { paidHistoryModel } from '../DB/models/PaidHistory.js';  // Assuming the paidHistory model is imported here
 
 // Function to check and expire subscriptions
 export const checkAndExpireSubscriptions = async () => {
@@ -32,13 +33,34 @@ export const checkAndExpireSubscriptions = async () => {
                 } else if (user.subscriptionType === 'monthly') {
                     expiryDate = moment(subscriptionDateTime).add(1, 'months');
                 }
+
                 // Log the calculated expiration date for debugging
                 // console.log('Calculated Expiry Date:', expiryDate.format('YYYY-MM-DD HH:mm:ss'));
+
                 // If the current time exceeds the expiration date, expire the subscription
                 if (now.isAfter(expiryDate)) {
                     console.log(`Subscription expired for user: ${user.userName}`);
+
+                    // Save to PaidHistory model using create method
+                    try {
+                        const newPaidHistory = await paidHistoryModel.create({
+                            userEmail: user.userEmail,
+                            userName: user.userName,
+                            subscriptionType: user.subscriptionType,
+                            subscriptionDate: user.subscriptionDate,
+                            subscriptionTime: user.subscriptionTime,
+                            expiryDate: expiryDate.format('YYYY-MM-DD HH:mm:ss'),  // Formatting expiry date
+                        });
+
+                        console.log(`Paid history saved for user: ${user.userName}`);
+                    } catch (saveError) {
+                        console.error(`Error saving paid history for user ${user.userName}:`, saveError.message);
+                    }
+
+                    // Expire the subscription
                     user.projectsPlan.project1 = false;
                     user.projectsPlan.project2 = false;
+                    user.projectsPlan.project3 = false;
                     user.projectsPlan.project4 = false;
                     user.subscriptionType = 'none';  // Reset subscription type to none
                     await user.save();  // Save the updated user
