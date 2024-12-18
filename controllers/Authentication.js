@@ -6,7 +6,7 @@ import { v4 } from 'uuid';
 import { transporter, mailOptions } from '../routes/mail.js';
 import { EMAIL_VERIFIED_WELCOME_TEMPLATE, PASSWORD_RESET_REQUEST_TEMPLATE, PASSWORD_RESET_SUCCESS_TEMPLATE, VERIFICATION_EMAIL_TEMPLATE,PLAN_ACTIVATED_SUCCESS_TEMPLATE } from '../routes/mailTemplate.js';
 import dotenv from 'dotenv'
-import { generateEmailOTP } from '../utils/generateEmailOTP';
+import { generateEmailOTP } from '../utils/generateEmailOTP.js';
 let DB = userModel
 
 // Config
