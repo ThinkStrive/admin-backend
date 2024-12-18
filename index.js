@@ -27,6 +27,8 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:5000',
+  'https://gamin01.netlify.app',
+  'https://admin-gaming.netlify.app'
   // Add more domains as needed
 ];
 
