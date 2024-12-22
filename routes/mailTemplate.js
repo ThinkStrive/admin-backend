@@ -551,15 +551,14 @@ export const PASSWORD_RESET_REQUEST_TEMPLATE = `
 
 `;
 
-export const PLAN_ACTIVATED_SUCCESS_TEMPLATE = `
-
+export const ROULETTE_PLAN_ACTIVATED_SUCCESS_TEMPLATE = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <title>Email Verification</title>
+  <title>DD Roulette plan activation email</title>
   <style>
     /* CSS Reset */
     * {
@@ -568,7 +567,7 @@ export const PLAN_ACTIVATED_SUCCESS_TEMPLATE = `
       box-sizing: border-box;
     }
     body {
-      font-family: sans-serif;
+      font-family: Arial, sans-serif;
       background-color: #f7fafc;
       margin: 0;
       padding: 0;
@@ -581,6 +580,54 @@ export const PLAN_ACTIVATED_SUCCESS_TEMPLATE = `
     }
     a {
       text-decoration: none;
+      transition: background-color 0.3s ease;
+    }
+    a:hover {
+      background-color: #805ad5;
+    }
+    h1, h2, h3, p {
+      margin-bottom: 16px;
+    }
+    ul {
+      margin-top: 8px;
+      padding-left: 24px;
+    }
+    li {
+      margin-bottom: 8px;
+    }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      padding: 12px 24px;
+      background-color: #6b46c1;
+      color: #fff !important;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease;
+    }
+    .button i {
+      font-size: 24px;
+      margin-right: 8px;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(to right, #4c51bf, #9f7aea);
+      padding: 16px 24px;
+      height: 100px;
+      gap: 16px;
+    }
+    .header img {
+      height: 48px;
+    }
+    .header h1 {
+      font-size: 20px;
+      color: white;
+      font-weight: bold;
+      margin: 0;
     }
   </style>
 </head>
@@ -591,46 +638,45 @@ export const PLAN_ACTIVATED_SUCCESS_TEMPLATE = `
         <!-- Main Container -->
         <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #fff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
           <tr>
-            <td style="background: linear-gradient(to right, #4c51bf, #9f7aea); padding: 24px; display: flex; align-items: center; gap: 16px;">
-              <img src="https://res.cloudinary.com/dmd5xjtit/image/upload/v1733136588/RouletteRise_Transperent_Logo_rhaaxk.png" alt="Logo" style="height: 64px;">
-              <h1 style="font-size: 24px; color: white; font-weight: bold; margin: 0;">Plan Activated Successfully</h1>
+            <td class="header">
+              <img src="https://res.cloudinary.com/dmd5xjtit/image/upload/v1733136588/RouletteRise_Transperent_Logo_rhaaxk.png" alt="Logo">
+              <h1>Plan activation success</h1>
             </td>
           </tr>
           <tr>
-            <td style="padding: 24px;">
-              <h1 style="font-size: 24px; font-weight: 600;">Dear [NAME],</h1>
-              <p style="color: #4a5568; font-size: 16px; line-height: 1.5;">Thank you for subscribing to the <strong>Data-Driven Roulette Tracker!</strong> Your [PLAN_NAME] subscription has been activated, and you now have access to all the premium features. If the subscription status isn’t showing as active, please refresh the page to update it.</p>
-              <p style="color: #4a5568; font-size: 16px; line-height: 1.5;">To help you get started, I highly recommend watching this detailed video that explains the entire system. It will guide you on how to use the features effectively and make informed decisions in real-time before placing your bets.</p>
-              <div>
-                <a href="https://youtu.be/4U9XHEjYnso" target="_blank" style="display: inline-flex; align-items: center; padding: 12px 24px; background-color: #6b46c1; color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color 0.3s ease; font-size: 16px;">
-                  <i class="fa-brands fa-youtube" style="font-size: 24px; margin-right: 8px;"></i>
+            <td style="padding:16px 24px 8px 24px;">
+              <h1 style="font-size: 16px; font-weight: 500;">Dear <strong>[USER_NAME],</strong></h1>
+              <p style="color: #4a5568; font-size: 16px; line-height: 1.6;">Thank you for subscribing to <strong>[GAME_NAME]</strong>. Your <strong>[SUBSCRIPTION_TYPE]</strong> subscription has been activated at <strong>[ACTIVATED_DATE] , [ACTIVATED_TIME]</strong> and you now have access to all the premium features. If the subscription status isn’t showing as active, please refresh the page to update it.</p>
+              <p style="color: #4a5568; font-size: 16px; line-height: 1.6;">To help you get started, I highly recommend watching this detailed video that explains the entire system. It will guide you on how to use the features effectively and make informed decisions in real-time before placing your bets.</p>
+              <div style="margin-bottom: 16px;">
+                <a href="https://youtu.be/4U9XHEjYnso" target="_blank" class="button">
+                  <i class="fa-brands fa-youtube"></i>
                   Watch on YouTube
                 </a>
               </div>
-              <p style="color: #4a5568; font-size: 16px; line-height: 1.5;">You can also learn more about the <strong>SpinCycle feature</strong> from the Help section in the app’s menu.</p>
-              <h2 style="font-size: 20px; font-weight: 600;">We’re thrilled to announce that:</h2>
+              <p style="color: #4a5568; font-size: 16px; line-height: 1.6;">You can also learn more about the <strong>SpinCycle feature</strong> from the Help section in the app’s menu.</p>
+              <h2 style="font-size: 20px; font-weight: 600; margin-top: 24px;">We’re thrilled to announce that:</h2>
               <div style="background-color: #f7fafc; padding: 16px; border-radius: 8px;">
-                <h3 style="font-size: 20px; font-weight: 600; color: #6b46c1;">Exciting Updates Coming Soon!</h3>
-                <ul style="list-style-type: disc; margin-left: 24px; color: #4a5568; margin-top: 8px;">
-                  <li>A new money management system and a daily profit plan will be updated in the coming week, helping you optimize your strategy even further.</li>
-                  <li>We are also launching our Baccarat Application, a groundbreaking addition that’s set to revolutionize the Baccarat industry.</li>
+                <h3 style="font-size: 20px; font-weight: 600; color: #6b46c1; margin-bottom: 16px;">Exciting Updates Are Here!</h3>
+                <ul style="color: #4a5568; font-size: 16px; line-height: 1.6;">
+                  <li>The new money management system and daily profit plan are now live, helping you optimize your strategy like never before.</li>
+                  <li>Our Baccarat Application has been successfully launched, delivering a groundbreaking addition to revolutionize the Baccarat industry.</li>
                 </ul>
-                <a href="https://youtu.be/JPfG1tT2Du0" target="_blank" style="display: inline-flex; align-items: center; padding: 8px 18px; background-color: #6b46c1; color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color 0.3s ease; font-size: 16px;">
-                    <i class="fa-brands fa-youtube" style="font-size: 24px; margin-right: 8px;"></i>
-                    Watch on YouTube
-                  </a>
-                <p style="color: #4a5568; font-size: 16px; line-height: 1.5;">Stay tuned for updates on this game-changing release!</p>
-                  
+                <a href="https://youtu.be/WXIMi97L3Cg" target="_blank" class="button" style="margin-top: 16px;">
+                  <i class="fa-brands fa-youtube"></i>
+                  Watch on YouTube
+                </a>
+                <p style="color: #4a5568; font-size: 16px; line-height: 1.6; margin-top: 16px;">Experience the impact of this game-changing release now!</p>
               </div>
-              <p style="color: #4a5568; font-size: 16px; line-height: 1.5;">Thank you again for choosing us. Wishing you great wins ahead!</p>
-              <p style="font-weight: bold; font-size: 16px; ">Warm regards,</p>
+              <p style="color: #4a5568; font-size: 16px; line-height: 1.6; margin-top: 16px;">Thank you again for choosing us. Wishing you great wins ahead!</p>
+              <p style="font-weight: bold; font-size: 16px; margin-top: 16px;">Warm regards,</p>
               <p style="font-weight: bold; font-size: 16px; color: #6b46c1;">RouletteRise</p>
             </td>
           </tr>
           <tr>
-            <td style="text-align: center; padding: 16px;">
-              <a href="https://t.me/rouletterisee" target="_blank" style="display: inline-flex; align-items: center; padding: 12px 24px; background-color: #6b46c1; color: white; border-radius: 9999px; font-size: 16px; transition: background-color 0.3s ease;">
-                <i class="fa-brands fa-telegram" style="font-size: 24px; margin-right: 8px;"></i>
+            <td style="text-align: center; padding-bottom: 16px;">
+              <a href="https://t.me/rouletterisee" target="_blank" class="button" style="border-radius: 9999px;">
+                <i class="fa-brands fa-telegram"></i>
                 Join our Telegram
               </a>
             </td>
@@ -641,10 +687,154 @@ export const PLAN_ACTIVATED_SUCCESS_TEMPLATE = `
   </table>
 </body>
 </html>
+`
 
+export const BACCARAT_PLAN_ACTIVATED_SUCCESS_TEMPLATE = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <title>Baccarat plan activation email</title>
+  <style>
+    /* CSS Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7fafc;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+    }
+    img {
+      display: block;
+      border: 0;
+    }
+    a {
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+    }
+    a:hover {
+      background-color: #805ad5;
+    }
+    h1, h2, h3, p {
+      margin-bottom: 16px;
+    }
+    ul {
+      margin-top: 8px;
+      padding-left: 24px;
+    }
+    li {
+      margin-bottom: 8px;
+    }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      padding: 12px 24px;
+      background-color: #6b46c1;
+      color: #fff !important;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease;
+    }
+    .button i {
+      font-size: 24px;
+      margin-right: 8px;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(to right, #4c51bf, #9f7aea);
+      padding: 16px 24px;
+      height: 100px;
+      gap: 16px;
+    }
+    .header img {
+      height: 48px;
+    }
+    .header h1 {
+      font-size: 20px;
+      color: white;
+      font-weight: bold;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f7fafc; padding: 20px 0;">
+    <tr>
+      <td align="center">
+        <!-- Main Container -->
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #fff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          <tr>
+            <td class="header">
+              <img src="https://res.cloudinary.com/dmd5xjtit/image/upload/v1733136588/RouletteRise_Transperent_Logo_rhaaxk.png" alt="Logo">
+              <h1>Plan activation success</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:16px 24px 8px 24px;">
+              <h1 style="font-size: 16px; font-weight: 500;">Dear <strong>[USER_NAME],</strong></h1>
+              <p style="color: #4a5568; font-size: 16px; line-height: 1.6;">Thank you for subscribing to <strong>[GAME_NAME]</strong>. Your <strong>[SUBSCRIPTION_TYPE]</strong> subscription has been activated at <strong>[ACTIVATED_DATE] , [ACTIVATED_TIME]</strong> and you now have access to all the premium features. If the subscription status isn’t showing as active, please refresh the page to update it.</p>
+              <p style="color: #4a5568; font-size: 16px; line-height: 1.6;">To help you get started, I highly recommend watching this detailed video that explains the entire system. It will guide you on how to use the features effectively and make informed decisions in real-time before placing your bets.</p>
+              <div style="margin-bottom: 16px;" style="color: #fff;">
+                <a href="https://www.youtube.com/watch?v=_FX-4f32pVE" target="_blank"
+  style="
+    display: inline-flex; 
+    align-items: center; 
+    padding: 12px 24px; 
+    background-color: #6b46c1; 
+    color: #fff !important; 
+    border-radius: 8px; 
+    font-size: 16px; 
+    font-weight: bold; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+    text-decoration: none; 
+    text-align: center;"
+>
+  <i class="fa-brands fa-youtube" style="font-size: 24px; margin-right: 8px; color: #fff !important;"></i>
+  Watch on YouTube
+</a>
 
-`;
-
+              </div>
+              <h2 style="font-size: 20px; font-weight: 600; margin-top: 24px;">We’re thrilled to announce that:</h2>
+              <div style="background-color: #f7fafc; padding: 16px; border-radius: 8px;">
+                <h3 style="font-size: 20px; font-weight: 600; color: #6b46c1; margin-bottom: 16px;"> Printing Money 💰💰💰 </h3>
+                <ul style="color: #4a5568; font-size: 16px; line-height: 1.6;">
+                  <li>We’re starting a 30-Day Challenge to grow <strong>€250</strong> into <strong>€4500</strong> using BaccaratBoost. Want to join the league? Message us on Telegram: <strong>@RouletteRise</strong></li>
+                  <li>new launch of Hit & Run Baccarat strategy</li>
+                </ul>
+                <p style="color: #4a5568; font-size: 16px; line-height: 1.6; margin-top: 16px;">Experience the impact of this game-changing release now!</p>
+              </div>
+              <p style="color: #4a5568; font-size: 16px; line-height: 1.6; margin-top: 16px;">Thank you again for choosing us. Wishing you great wins ahead!</p>
+              <p style="font-weight: bold; font-size: 16px; margin-top: 16px;">Warm regards,</p>
+              <p style="font-weight: bold; font-size: 16px; color: #6b46c1;">RouletteRise</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center; padding-bottom: 16px;">
+              <a href="https://t.me/rouletterisee" target="_blank" class="button" style="border-radius: 999px; text-decoration: none;color:#fff">
+                <i class="fa-brands fa-telegram"></i>
+                Join our Telegram
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+`
 
 export const PASSWORD_RESET_SUCCESS_TEMPLATE = `
 <!DOCTYPE html>
@@ -817,7 +1007,7 @@ export const ADMIN_MAIL_TEMPLATE = (subject,userName,dynamicBody)=>{
     <!-- Content Body -->
     <div style="background-color: white; padding: 1.5rem; border-radius: 0 0 0.5rem 0.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); position: relative;">
       <p style="margin-bottom: 1rem;">Hello, ${userName}</p>
-      <p style="margin-bottom: 1rem;">${dynamicBody}</p> 
+      <div style="margin-bottom: 1rem;">${dynamicBody}</div> 
 
       <p style="margin-bottom: 1rem;">Best regards,<br>
         <span style="color: #6b46c1; font-weight: bold;">RouletteRise</span>
