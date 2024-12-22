@@ -1,152 +1,76 @@
 import cron from 'node-cron';
 import moment from 'moment-timezone';
 import { userModel } from '../DB/models/Users.js';
-import { paidHistoryModel } from '../DB/models/PaidHistory.js';  
+import { paidHistoryModel } from '../DB/models/PaidHistory.js';  // Assuming the paidHistory model is imported here
 
-
-export const checkAndExpireRouletteSpincycle = async () => {
-    const users = await userModel.find({ subscriptionType: { $ne: 'none' } });
-
-    for (const user of users) {
-        try {
-            const now = moment().tz('Asia/Kolkata');
-
-            let dateStr = `${user.subscriptionDate} ${user.subscriptionTime}`;
-            if (!/^\d{2}:\d{2}:\d{2}$/.test(user.subscriptionTime)) {
-                dateStr = `${user.subscriptionDate} ${user.subscriptionTime}:00`;
-            }
-
-            const subscriptionDateTime = moment.tz(dateStr, 'YYYY-MM-DD HH:mm:ss', 'Asia/Kolkata');
-            if (!subscriptionDateTime.isValid()) {
-                throw new Error('Invalid subscription date/time');
-            }
-
-            let expiryDate;
-            switch (user.subscriptionType) {
-                case 'daily':
+// Function to check and expire subscriptions
+export const checkAndExpireSubscriptions = async () => {
+    // console.log('Running subscription expiration check');
+    const users = await userModel.find({});
+    users.forEach(async (user) => {
+        if (user.subscriptionType !== 'none') {
+            try {
+                // Get the current time in IST (India Standard Time)
+                const now = moment().tz('Asia/Kolkata');
+                // Combine subscriptionDate and subscriptionTime strings
+                let dateStr = `${user.subscriptionDate} ${user.subscriptionTime}`;
+                // If subscriptionTime is incomplete (e.g., missing seconds), pad it to 'HH:mm:ss'
+                if (!/^\d{2}:\d{2}:\d{2}$/.test(user.subscriptionTime)) {
+                    dateStr = `${user.subscriptionDate} ${user.subscriptionTime}:00`;
+                }
+                // Parse the subscription date and time correctly
+                const subscriptionDateTime = moment.tz(dateStr, 'YYYY-MM-DD HH:mm:ss', 'Asia/Kolkata');
+                // Check if the parsed date is valid
+                if (!subscriptionDateTime.isValid()) {
+                    throw new Error('Invalid subscription date/time');
+                }
+                let expiryDate;
+                // Calculate the expiration date based on subscription type
+                if (user.subscriptionType === 'daily') {
                     expiryDate = moment(subscriptionDateTime).add(1, 'days');
-                    break;
-                case 'weekly':
+                } else if (user.subscriptionType === 'weekly') {
                     expiryDate = moment(subscriptionDateTime).add(7, 'days');
-                    break;
-                case 'monthly':
+                } else if (user.subscriptionType === 'monthly') {
                     expiryDate = moment(subscriptionDateTime).add(1, 'months');
-                    break;
-                default:
-                    throw new Error(`Unknown subscription type: ${user.subscriptionType}`);
-            }
-
-            if (now.isAfter(expiryDate)) {
-                console.log(`Subscription expired for user: ${user.userName}`);
-
-                try {
-                    await paidHistoryModel.create({
-                        userEmail: user.userEmail,
-                        userName: user.userName,
-                        subscribedFor: "Data Driven Roulette and Spin Cycle",
-                        subscriptionType: user.subscriptionType,
-                        subscriptionDate: user.subscriptionDate,
-                        subscriptionTime: user.subscriptionTime,
-                        expiryDate: expiryDate.format('YYYY-MM-DD HH:mm:ss'),
-                    });
-
-                    console.log(`Paid history saved for user: ${user.userName}`);
-                } catch (saveError) {
-                    console.error(`Error saving paid history for user ${user.userName}:`, saveError.message);
                 }
 
-                // Expire the subscription
-                user.projectsPlan.project1 = false;
-                user.projectsPlan.project4 = false;
-                user.subscriptionType = 'none';
+                // Log the calculated expiration date for debugging
+                // console.log('Calculated Expiry Date:', expiryDate.format('YYYY-MM-DD HH:mm:ss'));
 
-                await user.save();
+                // If the current time exceeds the expiration date, expire the subscription
+                if (now.isAfter(expiryDate)) {
+                    console.log(`Subscription expired for user: ${user.userName}`);
+
+                    // Save to PaidHistory model using create method
+                    try {
+                        const newPaidHistory = await paidHistoryModel.create({
+                            userEmail: user.userEmail,
+                            userName: user.userName,
+                            subscriptionType: user.subscriptionType,
+                            subscriptionDate: user.subscriptionDate,
+                            subscriptionTime: user.subscriptionTime,
+                            expiryDate: expiryDate.format('YYYY-MM-DD HH:mm:ss'),  // Formatting expiry date
+                        });
+
+                        console.log(`Paid history saved for user: ${user.userName}`);
+                    } catch (saveError) {
+                        console.error(`Error saving paid history for user ${user.userName}:`, saveError.message);
+                    }
+
+                    // Expire the subscription
+                    user.projectsPlan.project1 = false;
+                    user.projectsPlan.project2 = false;
+                    user.projectsPlan.project3 = false;
+                    user.projectsPlan.project4 = false;
+                    user.subscriptionType = 'none';  // Reset subscription type to none
+                    await user.save();  // Save the updated user
+                }
+            } catch (error) {
+                console.error(`Error processing user ${user.userEmail}:`, error.message);
             }
-        } catch (error) {
-            console.error(`Error processing user ${user.userEmail}:`, error.message);
         }
-    }
-};
-
-
-
-export const checkAndExpireBaccarat = async () => {
-    const users = await userModel.find({
-        'projectSubscription.baccarat.subscriptionType': { $ne: 'none' },
-        'projectSubscription.baccarat.projectAccess': true
     });
-
-    for (const user of users) {
-        
-        const now = moment().tz('Asia/Kolkata');
-        const projectKey = 'baccarat';
-        const project = user.projectSubscription[projectKey];
-
-        try {
-            let dateStr = `${project.subscriptionDate} ${project.subscriptionTime}`;
-
-            if (!/^\d{2}:\d{2}:\d{2}$/.test(project.subscriptionTime)) {
-                dateStr = `${project.subscriptionDate} ${project.subscriptionTime}:00`;
-            }
-
-            const subscriptionDateTime = moment.tz(dateStr, 'YYYY-MM-DD HH:mm:ss', 'Asia/Kolkata');
-
-            if (!subscriptionDateTime.isValid()) {
-                throw new Error(`Invalid subscription date/time for project: ${projectKey}`);
-            }
-
-            let expiryDate;
-            switch (project.subscriptionType) {
-                case 'hourly':
-                    expiryDate = moment(subscriptionDateTime).add(1, 'hours');
-                    break;
-                case 'daily':
-                    expiryDate = moment(subscriptionDateTime).add(1, 'days');
-                    break;
-                case 'weekly':
-                    expiryDate = moment(subscriptionDateTime).add(7, 'days');
-                    break;
-                case 'monthly':
-                    expiryDate = moment(subscriptionDateTime).add(1, 'months');
-                    break;
-                default:
-                    throw new Error(`Unknown subscription type: ${project.subscriptionType}`);
-            }
-
-            if (now.isAfter(expiryDate)) {
-                console.log(`Subscription expired for user: ${user.userName}, project: ${projectKey}`);
-
-                try {
-                    await paidHistoryModel.create({
-                        userName: user.userName,
-                        userEmail: user.userEmail,
-                        subscribedFor: projectKey,
-                        subscriptionType: project.subscriptionType,
-                        subscriptionDate: project.subscriptionDate,
-                        subscriptionTime: project.subscriptionTime,
-                        expiryDate: expiryDate.format('YYYY-MM-DD HH:mm:ss')
-                    });
-
-                    console.log(`Paid history saved for user: ${user.userName}, project: ${projectKey}`);
-                } catch (error) {
-                    console.error(`Error saving paid history for user ${user.userName}, project ${projectKey}:`, error.message);
-                }
-
-                // Expire the subscription
-                project.projectAccess = false;
-                project.subscriptionType = 'none';
-                project.subscriptionDate = null;
-                project.subscriptionTime = null;
-
-                await user.save();
-            }
-        } catch (error) {
-            console.error(`Error processing user ${user.userEmail}, project ${projectKey}:`, error.message);
-        }
-    }
 };
 
-
-
-cron.schedule('* * * * *', checkAndExpireRouletteSpincycle); 
-cron.schedule('* * * * *', checkAndExpireBaccarat);
+// Schedule the function to run every minute
+cron.schedule('* * * * *', checkAndExpireSubscriptions);  // Runs every minute

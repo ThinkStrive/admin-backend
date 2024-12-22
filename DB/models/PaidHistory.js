@@ -6,8 +6,6 @@ const paidHistorySchema = new mongoose.Schema({
 
     userName: { type: String },
 
-    subscribedFor : { type : String},
-
     subscriptionType: { type: String },
 
     subscriptionDate: { type: String },

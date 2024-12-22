@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import axios from 'axios';
 import { v4 } from 'uuid';
 import { transporter, mailOptions } from '../routes/mail.js';
-import { EMAIL_VERIFIED_WELCOME_TEMPLATE, PASSWORD_RESET_REQUEST_TEMPLATE, PASSWORD_RESET_SUCCESS_TEMPLATE, VERIFICATION_EMAIL_TEMPLATE,ROULETTE_PLAN_ACTIVATED_SUCCESS_TEMPLATE , BACCARAT_PLAN_ACTIVATED_SUCCESS_TEMPLATE } from '../routes/mailTemplate.js';
+import { EMAIL_VERIFIED_WELCOME_TEMPLATE, PASSWORD_RESET_REQUEST_TEMPLATE, PASSWORD_RESET_SUCCESS_TEMPLATE, VERIFICATION_EMAIL_TEMPLATE,PLAN_ACTIVATED_SUCCESS_TEMPLATE } from '../routes/mailTemplate.js';
 import dotenv from 'dotenv'
 import { generateEmailOTP } from '../utils/generateEmailOTP.js';
 let DB = userModel
@@ -15,31 +15,44 @@ dotenv.config()
 //AUTH FLOW WITHOUT HASHED PASSWORD
 
 export const userLogin = async (req, res) => {
-    const { userEmail , password } = req.body
+    const payload = req.body
     try {
-        if (!userEmail || !password) {
+        if (!payload.userEmail || !payload.password) {
             return res.status(400).json({ status: false, data: 'Please fill the details' });
         }
-        // finding user By Email Id
-        let user = await DB.findOne({ userEmail });
 
-        if(!user){
-            return res.status(404).json({status:false,data:"No account found!"})
-        }
+        let checkUserEmail = await DB.findOne({ userEmail: payload.userEmail })
 
-        if (!user.isVerified) {
+        // if (checkUserEmail) {
+        //     if (!checkUserEmail.isVerified) {
+        //         return res.status(400).json({ status: false, data: 'Please verify your email' });
+        //     }
+        //     bcrypt.compare(payload.password, checkUserEmail.password, (err, result) => {
+        //         if (!result) {
+        //             res.status(401).send({ status: false, data: 'Invalid password' })
+        //         } else {
+        //             res.send({ status: true, data: checkUserEmail })
+        //         }
+        //     })
+        // } else {
+        //     res.status(409).send({ status: false, data: "You don't have an account yet." })
+        // }
+
+        if (checkUserEmail) {
+            if (!checkUserEmail.isVerified) {
+
                 const verificationToken = generateEmailOTP();
 
-                user.verificationToken=verificationToken;
-                user.verificationTokenExpiresAt=Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+                checkUserEmail.verificationToken=verificationToken;
+                checkUserEmail.verificationTokenExpiresAt=Date.now() + 24 * 60 * 60 * 1000; // 24 hours
 
-                await user.save();
+                await checkUserEmail.save();
 
 
                 // Prepare email options
                 const mailResponse = {
                     ...mailOptions,
-                    to: userEmail,
+                    to: payload.userEmail,
                     subject: "Verify your email",
                     html: VERIFICATION_EMAIL_TEMPLATE.replace("{verificationCode}", verificationToken)
                 };
@@ -48,47 +61,19 @@ export const userLogin = async (req, res) => {
                 await transporter.sendMail(mailResponse);
                 return res.status(400).json({ status: false, data: 'Please verify your email' });
             }
-
-            if (user.password !== password) {
-                return res.status(401).send({ status: false, data: 'Invalid password' })
+            if (checkUserEmail.password !== payload.password) {
+                res.status(401).send({ status: false, data: 'Invalid password' })
+            } else {
+                res.send({ status: true, data: checkUserEmail })
             }
-
-            // unique session token
-            const token = jwt.sign({userId:user._id},process.env.JWT_SECRET,{expiresIn:"1d"});
-            user.activeSessionToken = token;
-            await user.save();
-
-            return res.json({
-                status:true,
-                data:user
-        });
-
+        } else {
+            res.status(409).send({ status: false, data: "You don't have an account yet." })
+        }
     } catch (err) {
         console.log(err);
         return res.status(500).send({ msg: 'Internal Server Error', data: err });
     }
 }
-
-export const validateSession = async (req,res)=>{
-    const token = req.headers.authorization;
-
-    if(!token){
-        return res.status(401).json({status:false,data:"Unauthorized:Login Again!"});
-    }
-    try {
-        const decoded = jwt.verify(token,process.env.JWT_SECRET);
-        const user = await DB.findById(decoded.userId);
-
-        if(!user || user.activeSessionToken !== token){
-            return res.status(401).json({status:false,data:"Unauthorized: Invalid Session"});
-        }
-
-        return res.json({status:true,data:"Session is Valid"});
-    } catch (error) {
-        return res.status(401).json({status:false,data:"Unauthorized : Invalid Token"});
-    }
-}
-
 
 // export const userRegisterVerifyEmail = async (req, res) => {
 //     const { userEmail, password, userName, mobileNumber } = req.body;
@@ -412,12 +397,10 @@ export const userDelete = async (req, res) => {
 
 // plan activated successfully Mail 
 
-export const sendRoulettePlanActivatedEmail = async ({
-    gameName,
+export const sendPlanActivatedEmail = async ({
     userEmail,
     subscriptionType,
     subscriptionDate,
-    subscriptionTime,
 }) => {
     try {
         // Find user by email
@@ -429,68 +412,23 @@ export const sendRoulettePlanActivatedEmail = async ({
         const data = {
             name: validUser.userName,
             email: validUser.userEmail,
-            subscribed_game: gameName,
-            plan_type: subscriptionType,
+            plan_name: subscriptionType,
             activation_date: subscriptionDate,
-            activation_time: subscriptionTime
+            // expiry_date: expiryDate,
         };
 
-        const emailTemplate = ROULETTE_PLAN_ACTIVATED_SUCCESS_TEMPLATE
-            .replace('[SUBSCRIPTION_TYPE]', data.plan_type)
-            .replace('[ACTIVATED_DATE]', data.activation_date)
-            .replace('[ACTIVATED_TIME]',data.activation_time)
-            .replace('[GAME_NAME]', data.subscribed_game)
-            .replace('[USER_NAME]',data.name)
-        const mailResponse = {
-            ...mailOptions,
-            to: userEmail,
-            subject: `${data.subscribed_game} - ${data.plan_type} Plan is Activated Successfully`,
-            html: emailTemplate,
-        };
+        // Prepare email options with dynamic template
+        const emailTemplate = PLAN_ACTIVATED_SUCCESS_TEMPLATE
+            .replace('[PLAN_NAME]', data.plan_name)
 
-        // Send email
-        await transporter.sendMail(mailResponse);
-        console.log('Plan activation email sent successfully.');
-    } catch (error) {
-        console.error('Error in sendPlanActivatedEmail:', error);
-        throw error; 
-    }
-};
-
-export const sendBaccaratPlanActivatedEmail = async ({
-    gameName,
-    userEmail,
-    subscriptionType,
-    subscriptionDate,
-    subscriptionTime,
-}) => {
-    try {
-        // Find user by email
-        const validUser = await DB.findOne({ userEmail });
-        if (!validUser) {
-            throw new Error('Invalid user');
-        }
-
-        const data = {
-            name: validUser.userName,
-            email: validUser.userEmail,
-            subscribed_game: gameName,
-            plan_type: subscriptionType,
-            activation_date: subscriptionDate,
-            activation_time: subscriptionTime
-        };
-
-        const emailTemplate = BACCARAT_PLAN_ACTIVATED_SUCCESS_TEMPLATE
-        .replace('[SUBSCRIPTION_TYPE]', data.plan_type)
-        .replace('[ACTIVATED_DATE]', data.activation_date)
-        .replace('[ACTIVATED_TIME]',data.activation_time)
-        .replace('[GAME_NAME]', data.subscribed_game)
-        .replace('[USER_NAME]',data.name)
+            .replace('[NAME]',data.name);
+            // .replace('[ACTIVATION_DATE]', data.activation_date)
+            // .replace('[EXPIRY_DATE]', data.expiry_date);
 
         const mailResponse = {
             ...mailOptions,
             to: userEmail,
-            subject: `${data.subscribed_game} - ${data.plan_type} Plan is Activated Successfully`,
+            subject: `Your ${subscriptionType} Plan is Activated Successfully`,
             html: emailTemplate,
         };
 
