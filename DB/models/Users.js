@@ -31,10 +31,21 @@ const userSchema = new mongoose.Schema({
     },
     subscriptionDate : {type : String, default : 'none'},
     subscriptionTime : {type : String, default : 'none'},
+    projectSubscription : {
+        baccarat:{
+            projectAccess : { type : Boolean , default: false},
+            subscriptionType: {
+                type: String,
+                enum: ['hourly','daily', 'weekly', 'monthly', 'none'],
+                default: 'none'
+            },
+            subscriptionDate : {type : String, default : null},
+            subscriptionTime : {type : String, default : null},
+        },
+    },
     projectsPlan : {
         project1 : { type : Boolean, default : false },
         project2 : { type : Boolean, default : true },
-        project3 : { type : Boolean, default : false },
         project4 : { type : Boolean, default : false },
     },
     isVerified:{
@@ -43,9 +54,13 @@ const userSchema = new mongoose.Schema({
     },
     verificationToken:String,
     verificationTokenExpiresAt:Date,
+    activeSessionToken:String
 },{timestamps:true});
 
-userSchema.index({userEmail:1});
-userSchema.index({mobileNumber:1});
+userSchema.index({ userEmail:1 });
+userSchema.index({ mobileNumber:1 });
+userSchema.index({ createdAt: 1 });
+userSchema.index({ subscriptionType: 1 }); 
+userSchema.index({ "projectSubscription.baccarat.subscriptionType": 1 });
 
 export const userModel = mongoose.model('users', userSchema);

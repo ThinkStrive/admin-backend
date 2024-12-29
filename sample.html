@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christmas UI Design</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #0c1b33;
+        }
+        .christmas-container {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            overflow: hidden;
+            border: 5px solid #fff;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+        .snowfall {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('https://res.cloudinary.com/dxsdme4qy/image/upload/v1734766182/snowflakes-15549_fhwftc.gif') no-repeat center center;
+            background-size: cover;
+        }
+        .tree {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: url('https://res.cloudinary.com/dxsdme4qy/image/upload/v1734766180/christmas-tree-2528_jfs4v1.gif') no-repeat center center;
+            background-size: contain;
+        }
+        .coin {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+        }
+        .coin1 {
+            top: 10%;
+            left: 10%;
+            background: url('https://res.cloudinary.com/dxsdme4qy/image/upload/v1734766174/coin-14299_512_tl7haz.gif') no-repeat center center;
+            background-size: contain;
+        }
+        .coin2 {
+            top: 10%;
+            right: 10%;
+            background: url('https://res.cloudinary.com/dxsdme4qy/image/upload/v1734766171/coin-14297_d9sl7y.gif') no-repeat center center;
+            background-size: contain;
+        }
+        .reindeer {
+            position: absolute;
+            bottom: 10%;
+            left: 15%;
+            width: 150px;
+            height: 150px;
+            background: url('https://res.cloudinary.com/dxsdme4qy/image/upload/v1734766167/deer-16226_pwysqm.gif') no-repeat center center;
+            background-size: contain;
+        }
+        .candle-ring {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 200px;
+            background: url('https://res.cloudinary.com/dxsdme4qy/image/upload/v1734766165/Rings-Light_vedmta.gif') no-repeat center center;
+            background-size: contain;
+        }
+    </style>
+</head>
+<body>
+    <div class="christmas-container">
+        <div class="snowfall"></div>
+        <div class="tree"></div>
+        <div class="coin coin1"></div>
+        <div class="coin coin2"></div>
+        <div class="reindeer"></div>
+        <div class="candle-ring"></div>
+    </div>
+</body>
+</html>

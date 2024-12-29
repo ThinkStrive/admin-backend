@@ -5,7 +5,7 @@ import { dbConnect } from './DB/connection/Connection.js';
 import { usersRoute } from './routes/Users.js';
 import { authRoute } from './routes/Authentication.js';
 import { paymentRouter } from './routes/payment.js';
-import { checkAndExpireSubscriptions } from './controllers/Schedule.js';
+import { checkAndExpireRouletteSpincycle , checkAndExpireBaccarat } from './controllers/Schedule.js';
 import { feedbackRoutes } from './routes/Feedback.js'; 
 import { historyRouter } from './routes/paidHistoryRoutes.js';
 import { AdminEmailRoute } from './routes/AdminEmail.js';
@@ -27,8 +27,7 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:5000',
-  'https://gamin01.netlify.app',
-  'https://admin-gaming.netlify.app'
+  'https://gamin01.netlify.app'
   // Add more domains as needed
 ];
 
@@ -62,7 +61,8 @@ app.use('/email',AdminEmailRoute);
 
 
 // Schedule Expiry Check
-checkAndExpireSubscriptions();
+checkAndExpireBaccarat();
+checkAndExpireRouletteSpincycle();
 
 // Default Route
 
