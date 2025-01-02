@@ -430,7 +430,7 @@ export const sendRoulettePlanActivatedEmail = async ({
             name: validUser.userName,
             email: validUser.userEmail,
             subscribed_game: gameName,
-            plan_type: subscriptionType,
+            plan_type: (subscriptionType === 'twoDays') ? "48 Hours" : subscriptionType,
             activation_date: subscriptionDate,
             activation_time: subscriptionTime
         };
@@ -475,7 +475,7 @@ export const sendBaccaratPlanActivatedEmail = async ({
             name: validUser.userName,
             email: validUser.userEmail,
             subscribed_game: gameName,
-            plan_type: subscriptionType,
+            plan_type: (subscriptionType === 'twoDays') ? "48 Hours" : subscriptionType,
             activation_date: subscriptionDate,
             activation_time: subscriptionTime
         };

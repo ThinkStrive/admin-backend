@@ -26,6 +26,9 @@ export const checkAndExpireRouletteSpincycle = async () => {
                 case 'daily':
                     expiryDate = moment(subscriptionDateTime).add(1, 'days');
                     break;
+                case 'twoDays':
+                    expiryDate = moment(subscriptionDateTime).add(2, 'days');
+                    break;
                 case 'weekly':
                     expiryDate = moment(subscriptionDateTime).add(7, 'days');
                     break;
@@ -102,6 +105,9 @@ export const checkAndExpireBaccarat = async () => {
                     break;
                 case 'daily':
                     expiryDate = moment(subscriptionDateTime).add(1, 'days');
+                    break;
+                case 'twoDays':
+                    expiryDate = moment(subscriptionDateTime).add(2, 'days');
                     break;
                 case 'weekly':
                     expiryDate = moment(subscriptionDateTime).add(7, 'days');

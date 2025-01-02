@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema({
     }],
     subscriptionType: {
         type: String,
-        enum: ['daily', 'weekly', 'monthly', 'none'],
+        enum: ['daily', 'twoDays' , 'weekly', 'monthly', 'none'],
         default: 'none'
     },
     isPaid : {
@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema({
             projectAccess : { type : Boolean , default: false},
             subscriptionType: {
                 type: String,
-                enum: ['hourly','daily', 'weekly', 'monthly', 'none'],
+                enum: ['hourly','daily', 'twoDays' , 'weekly', 'monthly', 'none'],
                 default: 'none'
             },
             subscriptionDate : {type : String, default : null},
@@ -54,7 +54,6 @@ const userSchema = new mongoose.Schema({
     },
     verificationToken:String,
     verificationTokenExpiresAt:Date,
-    activeSessionToken:String
 },{timestamps:true});
 
 userSchema.index({ userEmail:1 });
