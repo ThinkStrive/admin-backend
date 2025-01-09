@@ -9,7 +9,7 @@ import { checkAndExpireRouletteSpincycle , checkAndExpireBaccarat } from './cont
 import { feedbackRoutes } from './routes/Feedback.js'; 
 import { historyRouter } from './routes/paidHistoryRoutes.js';
 import { AdminEmailRoute } from './routes/AdminEmail.js';
-import paypalRouter from './routes/PayPalPayments.js';
+import paypalRouter from './routes/paypalPayments.js';
 
 // Config
 dotenv.config();
