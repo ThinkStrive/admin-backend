@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema({
     }],
     subscriptionType: {
         type: String,
-        enum: ['daily', 'twoDays' , 'weekly', 'monthly', 'none'],
+        enum: ['thirtyMinutes','daily', 'twoDays' , 'weekly', 'monthly', 'none'],
         default: 'none'
     },
     isPaid : {
@@ -31,16 +31,18 @@ const userSchema = new mongoose.Schema({
     },
     subscriptionDate : {type : String, default : 'none'},
     subscriptionTime : {type : String, default : 'none'},
+    rouletteExpiryDate : {type : Date, default : null},
     projectSubscription : {
         baccarat:{
             projectAccess : { type : Boolean , default: false},
             subscriptionType: {
                 type: String,
-                enum: ['hourly','daily', 'twoDays' , 'weekly', 'monthly', 'none'],
+                enum: ['thirtyMinutes','hourly','daily', 'twoDays' , 'weekly', 'monthly', 'none'],
                 default: 'none'
             },
             subscriptionDate : {type : String, default : null},
             subscriptionTime : {type : String, default : null},
+            expiryDate : {type: Date, default : null}
         },
     },
     projectsPlan : {
@@ -53,7 +55,7 @@ const userSchema = new mongoose.Schema({
         default:false
     },
     verificationToken:String,
-    verificationTokenExpiresAt:Date,
+    verificationTokenExpiresAt:Date
 },{timestamps:true});
 
 userSchema.index({ userEmail:1 });

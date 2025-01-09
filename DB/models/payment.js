@@ -5,9 +5,12 @@ const paymentSchema = mongoose.Schema({
     payment_id : {
         type : String,
         required : true,
-        // unique : true
     },
-    payment_session_id : {
+    payment_status : {
+        type : String,
+        required : true
+    },
+    roulette_rise_email : {
         type : String,
         required : true
     },
@@ -19,23 +22,30 @@ const paymentSchema = mongoose.Schema({
         type : String,
         required : true,
     },
-    payment_for : {
+    subscription_for : {
         type : String,
         required : true
+    },
+    subscription_type : {
+        type : String,
+        required: true
     },
     amount : {
         type : String,
         required : true
     },
-    currency : {
+    paypal_name : {
+        type : String,
+        required : true
+    }, 
+    paypal_email: {
         type : String,
         required : true
     },
-    gateway_name : {
+    paypal_payer_id : {
         type : String,
         required : true
-    },
-    customer_details : {}
+    }
 },{timestamps:true})
 
 

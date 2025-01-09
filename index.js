@@ -9,6 +9,7 @@ import { checkAndExpireRouletteSpincycle , checkAndExpireBaccarat } from './cont
 import { feedbackRoutes } from './routes/Feedback.js'; 
 import { historyRouter } from './routes/paidHistoryRoutes.js';
 import { AdminEmailRoute } from './routes/AdminEmail.js';
+import paypalRouter from './routes/PayPalPayments.js';
 
 // Config
 dotenv.config();
@@ -59,6 +60,7 @@ app.use('/payment', paymentRouter);
 app.use('/feedback', feedbackRoutes);
 app.use('/paid-history' , historyRouter);
 app.use('/email',AdminEmailRoute);
+app.use('/paypal',paypalRouter);
 
 
 // Schedule Expiry Check

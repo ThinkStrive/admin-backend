@@ -2,7 +2,8 @@ import bcrypt from 'bcryptjs';
 import { v4 } from 'uuid';
 import { userModel } from '../DB/models/Users.js';
 import { sendRoulettePlanActivatedEmail , sendBaccaratPlanActivatedEmail } from './Authentication.js';
-import { format } from "date-fns";
+import moment from 'moment-timezone';
+import { calculateExpiryDate } from '../utils/helpers.js';
 
 
 
@@ -156,20 +157,22 @@ export const filterByProjectSubscriptions = async (req,res) =>{
 }
 
 // get a  User
-export const getSingleUser = async (req, res) => {
-    let { id } = req.params
+export const getSingleUser = async ( req,res ) => {
+    const { id } = req.params;
+
     try {
-        let checkUserExists = await DB.findOne({ _id: id });
-        if (checkUserExists) {
-            res.status(200).send({ status: true, data: checkUserExists });
-        } else {
-            res.status(409).send({ status: false, msg: "user doesn't exists" })
+        const user = await DB.findById(id).select('-password');
+
+        if(!user) {
+            return res.status(404).json( { status: false , data : "User doesn't exist"});
         }
+
+        res.status(200).json( { status: true , data : user });
     } catch (err) {
-        console.log(err);
-        return res.status(500).send({ msg: 'Internal Server Error', data: err });
+        console.error(err);
+        res.status(500).json({ status: false , data: "Internal server Error"})
     }
-};
+}
 
 
 
@@ -249,18 +252,110 @@ export const createNewUser = async (req, res) => {
 //     }
 // };
 
+// export const updateSingleUser = async (req, res) => {
+//     let payload = req.body;
+//     let { id } = req.params;
+
+//     try {
+//         // Fetch existing user details
+//         const existingUser = await DB.findOne({ _id: id });
+//         if (!existingUser) {
+//             return res.status(409).send({ status: false, message: "User doesn't exist" });
+//         }
+
+//         if (payload.subscriptionType && payload.subscriptionType !== 'none'){
+//             const subscriptionDateTime = moment.tz(`${payload.subscriptionDate} ${payload.subscriptionTime}` , 'YYYY-MM-DD HH:mm:ss' , 'Asia/Kolkata');
+//         }
+
+
+//         // Update user details in the database
+//         const userDataUpdated = await DB.findOneAndUpdate(
+//             { _id: id },
+//             { $set: payload },
+//             { new: true }
+//         );
+
+//         if (!userDataUpdated) {
+//             return res.status(500).send({ status: false, message: "Problem updating user details" });
+//         }
+
+//         // Mail for Baccarat
+//         if (payload.projectSubscription?.baccarat?.subscriptionType !== "none") {
+//             const [projectName, subscriptionDetails] = Object.entries(payload.projectSubscription)[0];
+//             const existingSubscription = existingUser.projectSubscription?.[projectName];
+
+//             if (
+//                 !existingSubscription ||
+//                 existingSubscription.subscriptionType !== subscriptionDetails.subscriptionType ||
+//                 existingSubscription.subscriptionDate !== subscriptionDetails.subscriptionDate ||
+//                 existingSubscription.subscriptionTime !== subscriptionDetails.subscriptionTime
+//             ) {
+//                 try {
+//                     await sendBaccaratPlanActivatedEmail({
+//                         gameName: "Baccarat",
+//                         userEmail: userDataUpdated.userEmail,
+//                         subscriptionType: subscriptionDetails.subscriptionType,
+//                         subscriptionDate: subscriptionDetails.subscriptionDate,
+//                         subscriptionTime: subscriptionDetails.subscriptionTime
+//                     });
+//                 } catch (error) {
+//                     console.error(`Error sending email for ${projectName}:`, error);
+//                 }
+//             }
+//         }
+
+//         // Mail for Data Driven Roulette and Spin Cycle subscription
+//         if (
+//             payload.subscriptionType !== "none" &&
+//             (payload.subscriptionType !== existingUser.subscriptionType ||
+//                 payload.subscriptionDate !== existingUser.subscriptionDate ||
+//                 payload.subscriptionTime !== existingUser.subscriptionTime)
+//         ) {
+//             try {
+//                 await sendRoulettePlanActivatedEmail({
+//                     gameName: "Data Driven Roulette Tracker and Spin Cycle Stratergy",
+//                     userEmail: userDataUpdated.userEmail,
+//                     subscriptionType: payload.subscriptionType,
+//                     subscriptionDate: payload.subscriptionDate,
+//                     subscriptionTime: payload.subscriptionTime
+//                 });
+//             } catch (error) {
+//                 console.error('Error sending email for Data Driven Roulette and Spin Cycle:', error);
+//             }
+//         }
+
+//         return res.status(200).send({ status: true, data: userDataUpdated });
+//     } catch (err) {
+//         console.error('Error in updateSingleUser:', err);
+//         return res.status(500).send({ status: false, message: 'Internal server error', error: err });
+//     }
+// };
+
 export const updateSingleUser = async (req, res) => {
-    let payload = req.body;
-    let { id } = req.params;
+    const payload = req.body;
+    const { id } = req.params;
 
     try {
-        // Fetch existing user details
         const existingUser = await DB.findOne({ _id: id });
         if (!existingUser) {
             return res.status(409).send({ status: false, message: "User doesn't exist" });
         }
 
-        // Update user details in the database
+        // roulette expiry
+        if (payload.subscriptionType && payload.subscriptionType !== 'none') {
+            const subscriptionDateTime = moment.tz(`${payload.subscriptionDate} ${payload.subscriptionTime}`, 'YYYY-MM-DD HH:mm:ss', 'Asia/Kolkata');
+            payload.rouletteExpiryDate = calculateExpiryDate(payload.subscriptionType, subscriptionDateTime);
+        }
+
+        // baccarat expiry
+        if (
+            payload.projectSubscription?.baccarat?.subscriptionType &&
+            payload.projectSubscription.baccarat.subscriptionType !== 'none'
+        ) {
+            const baccaratDateTime = moment.tz(`${payload.projectSubscription.baccarat.subscriptionDate} ${payload.projectSubscription.baccarat.subscriptionTime}`, 'YYYY-MM-DD HH:mm:ss', 'Asia/Kolkata');
+            payload.projectSubscription.baccarat.expiryDate = calculateExpiryDate(payload.projectSubscription.baccarat.subscriptionType, baccaratDateTime);
+        }
+
         const userDataUpdated = await DB.findOneAndUpdate(
             { _id: id },
             { $set: payload },
@@ -271,48 +366,50 @@ export const updateSingleUser = async (req, res) => {
             return res.status(500).send({ status: false, message: "Problem updating user details" });
         }
 
-        // Mail for Baccarat
-        if (payload.projectSubscription?.baccarat?.subscriptionType !== "none") {
-            const [projectName, subscriptionDetails] = Object.entries(payload.projectSubscription)[0];
-            const existingSubscription = existingUser.projectSubscription?.[projectName];
-
-            if (
-                !existingSubscription ||
-                existingSubscription.subscriptionType !== subscriptionDetails.subscriptionType ||
-                existingSubscription.subscriptionDate !== subscriptionDetails.subscriptionDate ||
-                existingSubscription.subscriptionTime !== subscriptionDetails.subscriptionTime
-            ) {
-                try {
-                    await sendBaccaratPlanActivatedEmail({
-                        gameName: "Baccarat",
-                        userEmail: userDataUpdated.userEmail,
-                        subscriptionType: subscriptionDetails.subscriptionType,
-                        subscriptionDate: subscriptionDetails.subscriptionDate,
-                        subscriptionTime: subscriptionDetails.subscriptionTime
-                    });
-                } catch (error) {
-                    console.error(`Error sending email for ${projectName}:`, error);
-                }
-            }
-        }
-
-        // Mail for Data Driven Roulette and Spin Cycle subscription
+        // Roulette email
         if (
-            payload.subscriptionType !== "none" &&
-            (payload.subscriptionType !== existingUser.subscriptionType ||
+            payload.subscriptionType &&
+            payload.subscriptionType !== 'none' &&
+            (
+                payload.subscriptionType !== existingUser.subscriptionType ||
                 payload.subscriptionDate !== existingUser.subscriptionDate ||
-                payload.subscriptionTime !== existingUser.subscriptionTime)
+                payload.subscriptionTime !== existingUser.subscriptionTime
+            )
         ) {
             try {
                 await sendRoulettePlanActivatedEmail({
-                    gameName: "Data Driven Roulette Tracker and Spin Cycle Stratergy",
-                    userEmail: userDataUpdated.userEmail,
+                    gameName: "Data Driven Roulette Tracker and Spin Cycle Strategy",
+                    userEmail: existingUser.userEmail,
                     subscriptionType: payload.subscriptionType,
                     subscriptionDate: payload.subscriptionDate,
                     subscriptionTime: payload.subscriptionTime
                 });
             } catch (error) {
-                console.error('Error sending email for Data Driven Roulette and Spin Cycle:', error);
+                console.error('Error sending email for Roulette:', error);
+            }
+        }
+
+        // Baccarat email
+        if (
+            payload.projectSubscription?.baccarat?.subscriptionType &&
+            payload.projectSubscription.baccarat.subscriptionType !== 'none' &&
+            (
+                !existingUser?.projectSubscription?.baccarat ||
+                payload.projectSubscription.baccarat.subscriptionType !== existingUser.projectSubscription.baccarat.subscriptionType ||
+                payload.projectSubscription.baccarat.subscriptionDate !== existingUser.projectSubscription.baccarat.subscriptionDate ||
+                payload.projectSubscription.baccarat.subscriptionTime !== existingUser.projectSubscription.baccarat.subscriptionTime
+            )
+        ) {
+            try {
+                await sendBaccaratPlanActivatedEmail({
+                    gameName: "Baccarat",
+                    userEmail: existingUser.userEmail,
+                    subscriptionType: payload.projectSubscription.baccarat.subscriptionType,
+                    subscriptionDate: payload.projectSubscription.baccarat.subscriptionDate,
+                    subscriptionTime: payload.projectSubscription.baccarat.subscriptionTime
+                });
+            } catch (error) {
+                console.error('Error sending email for Baccarat:', error);
             }
         }
 

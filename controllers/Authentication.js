@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import axios from 'axios';
 import { v4 } from 'uuid';
 import { transporter, mailOptions } from '../routes/mail.js';
-import { EMAIL_VERIFIED_WELCOME_TEMPLATE, PASSWORD_RESET_REQUEST_TEMPLATE, PASSWORD_RESET_SUCCESS_TEMPLATE, VERIFICATION_EMAIL_TEMPLATE,ROULETTE_PLAN_ACTIVATED_SUCCESS_TEMPLATE , BACCARAT_PLAN_ACTIVATED_SUCCESS_TEMPLATE } from '../routes/mailTemplate.js';
+import { EMAIL_VERIFIED_WELCOME_TEMPLATE, PASSWORD_RESET_REQUEST_TEMPLATE, PASSWORD_RESET_SUCCESS_TEMPLATE, VERIFICATION_EMAIL_TEMPLATE,ROULETTE_PLAN_ACTIVATED_SUCCESS_TEMPLATE , BACCARAT_PLAN_ACTIVATED_SUCCESS_TEMPLATE , PLAN_EXPIRED_TEMPLATE } from '../routes/mailTemplate.js';
 import dotenv from 'dotenv'
 import { generateEmailOTP } from '../utils/generateEmailOTP.js';
 let DB = userModel
@@ -52,11 +52,6 @@ export const userLogin = async (req, res) => {
             if (user.password !== password) {
                 return res.status(401).send({ status: false, data: 'Invalid password' })
             }
-
-            // unique session token
-            const token = jwt.sign({userId:user._id},process.env.JWT_SECRET,{expiresIn:"1d"});
-            user.activeSessionToken = token;
-            await user.save();
 
             return res.json({
                 status:true,
@@ -430,7 +425,7 @@ export const sendRoulettePlanActivatedEmail = async ({
             name: validUser.userName,
             email: validUser.userEmail,
             subscribed_game: gameName,
-            plan_type: (subscriptionType === 'twoDays') ? "48 Hours" : subscriptionType,
+            plan_type: (subscriptionType === 'twoDays') ? "48 Hours" : (subscriptionType === 'thirtyMinutes') ? "30 Minutes" : subscriptionType,
             activation_date: subscriptionDate,
             activation_time: subscriptionTime
         };
@@ -475,7 +470,7 @@ export const sendBaccaratPlanActivatedEmail = async ({
             name: validUser.userName,
             email: validUser.userEmail,
             subscribed_game: gameName,
-            plan_type: (subscriptionType === 'twoDays') ? "48 Hours" : subscriptionType,
+            plan_type: (subscriptionType === 'twoDays') ? "48 Hours" : (subscriptionType === 'thirtyMinutes') ? "30 Minutes" : subscriptionType,
             activation_date: subscriptionDate,
             activation_time: subscriptionTime
         };
@@ -503,3 +498,22 @@ export const sendBaccaratPlanActivatedEmail = async ({
     }
 };
 
+export const sendExpiryEmail = async (userEmail, userName, planName , gameName) => {
+    try {
+        const subject = `Subscription Has Expired For : ${gameName}`;
+        const emailTemplate = PLAN_EXPIRED_TEMPLATE(subject, userName, gameName, planName);
+
+        const mailResponse = {
+            ...mailOptions,
+            to: userEmail,
+            subject: subject,
+            html: emailTemplate,
+        };
+
+        await transporter.sendMail(mailResponse);
+        console.log(`Expiry email sent successfully to ${userEmail}`);
+    } catch (error) {
+        console.error(`Error sending expiry email to ${userEmail}:`, error);
+        throw error;
+    }
+};
