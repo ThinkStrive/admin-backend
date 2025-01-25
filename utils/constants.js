@@ -15,7 +15,7 @@ export const SUBSCRIPTION_PLANS = [
   {
     subFor: "baccarat",
     subType: "monthly",
-    planID: "P-97D20324N8642641JM557SSI",
+    planID: "P-5KV64304BC1176604M6J3WIQ",
   },
   {
     subFor: "roulette",
@@ -30,7 +30,7 @@ export const SUBSCRIPTION_PLANS = [
   {
     subFor: "roulette",
     subType: "monthly",
-    planID: "P-6GU89872L45628137M557UVA",
+    planID: "P-3GB33723SE950382VM6J3VUY",
   },
 ];
 
@@ -51,7 +51,7 @@ export const SUBSCRIPTION_PLANS = [
 //   {
 //     subFor: "baccarat",
 //     subType: "monthly",
-//     planID: "P-8B5288829J233681XM53FLGI",
+//     planID: "P-5KV64304BC1176604M6J3WIQ",
 //   },
 //   {
 //     subFor: "roulette",
@@ -66,6 +66,13 @@ export const SUBSCRIPTION_PLANS = [
 //   {
 //     subFor: "roulette",
 //     subType: "monthly",
-//     planID: "P-5A710308XM4151417M53FJUI",
+//     planID: "P-3GB33723SE950382VM6J3VUY",
 //   },
 // ];
+
+
+
+
+
+// roulette monthly plan 300$ =  planID: "P-5A710308XM4151417M53FJUI",
+//baccarat monthly plan 500$ =     planID: "P-8B5288829J233681XM53FLGI",
